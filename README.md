@@ -1,4 +1,4 @@
-# Fountain-scene-numbers
+# Fountain Scene Numbers
 A tool for automatically setting scene numbers in Fountain files
 
 Live version: http://kapitan.fi/fountain
