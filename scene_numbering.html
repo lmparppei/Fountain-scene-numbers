@@ -1,0 +1,152 @@
+<!--
+
+© KAPITAN! 2018
+Released under MIT license
+
+-->
+<!doctype html>
+<html>
+	<head>
+		<title>Fountain screenplay scene numbering</title>
+		<meta charset="utf-8"/>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	</head>
+	<style type="text/css">
+		body {
+			font-family: sans-serif;
+			background-color: #eeeeee;
+		}
+		section {
+			margin: 1rem auto 1rem auto;
+			max-width: 50rem;
+		}
+		textarea {
+			padding: 1rem;
+			font-family: "Courier Prime", courier;
+			font-size: 1em;
+			width: 100%;
+			min-height: 30rem;
+		}
+		textarea:focus { outline: none; }
+		.drop {
+			background-color: #0099ee;
+			color: #0099ee;
+			border: solid 1px teal;
+		}
+	</style>
+	<body>
+		<section>
+			<h1>Fountain scene numbers</h1>
+			<p>This is a tool for automatically setting scene numbers in screenplays written in plain-text Fountain format. Until Slugline, Logline, Writer and such add this feature to their apps, an additional roundtrip is needed unless you prefer doing it by hand.</p>
+			<p>Paste or drag Fountain file in the area below.</p>
+			<textarea id='text' ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="stopDrop(event)">Title: Sample Fountain script for testing automatic scene numbering
+
+INT. A HOUSE - DAY
+
+This is an example.
+
+CHARACTER
+I'm here to set an example too.
+
+EXT. YARD - NIGHT
+
+This is another scene.
+
+.A FORCED SCENE HEADING
+
+Scene headings without int./ext. prefix need to be forced.
+
+</textarea><br>
+			<button onclick='setSceneNumbers()'>Add scene numbers</button>
+			<button onclick='download()'>Download Fountain file</button>
+		</section>
+
+		<script>
+
+			// Textarea to use
+			const text = document.getElementById('text');
+
+			// Default filename for copy/paste scripts
+			let filename = 'Sample.fountain';
+
+			// Regular expressions for scene heading / numbering
+			const exp = {
+				sceneHeading: /^(([iI][nN][tT]|[eE][xX][tT]|[^\w][eE][sS][tT]|\.|[iI]\.?\/[eE]\.?)([^\n]+))/g,
+				sceneNumber: /\#([0-9A-Za-z\\.\\)-]+)\#/
+			}
+			
+			function setSceneNumbers () {
+				const content = text.value;
+				const lines = content.split("\n");
+				let newLines = [];
+
+				let sceneNumber = 1;
+				
+				// Go through the script line by line
+				for (let i in lines) {
+					let line = lines[i];
+
+					// We found a scene heading
+					if (line.match(exp.sceneHeading)) {
+						// Clean up any existing scene numbers
+						if (line.match(exp.sceneNumber)) {
+							line = line.replace(exp.sceneNumber, '');
+						}
+
+						// Add a Fountain scene number, #x#
+						line = line.trim() + " #" + sceneNumber + "#";
+						sceneNumber++;
+					}
+
+					newLines.push(line);
+				}
+
+				text.value = newLines.join("\n");
+			}
+
+			function allowDrop(ev) {
+				ev.target.className = 'drop';
+		    	ev.preventDefault();
+			}
+
+			function stopDrop(ev) {
+				ev.target.className = '';
+			}
+
+			function drop(ev) {
+		   		ev.preventDefault();
+		   		text.className = '';
+
+				const file = ev.dataTransfer.items[0].getAsFile(); 	
+				const content = file.slice(0, file.size, "text");
+				const reader = new FileReader();
+
+				// Change the default filename to that of the uploaded file
+				filename = file.name;
+
+				reader.addEventListener('loadend', (e) => {
+					const data = e.srcElement.result;
+					text.value = data;
+				});
+
+				reader.readAsText(content);
+			}
+
+			// Thanks to A-Sharabiani on stackoverflow
+			function download (){
+			    var content = text.value;
+			    var blob = new Blob([content], { type: "text/plain"});
+			    var anchor = document.createElement("a");
+			    anchor.download = filename;
+			    anchor.href = window.URL.createObjectURL(blob);
+			    anchor.target ="_blank";
+			    anchor.style.display = "none"; 
+			    document.body.appendChild(anchor);
+			    anchor.click();
+			    document.body.removeChild(anchor);
+			 }
+
+		</script>
+	</body>
+</html> 
