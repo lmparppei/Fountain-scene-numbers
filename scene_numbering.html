@@ -38,7 +38,8 @@ Released under MIT license
 	<body>
 		<section>
 			<h1>Fountain scene numbers</h1>
-			<p>This is a tool for automatically setting scene numbers in screenplays written in plain-text Fountain format. Until Slugline, Logline, Writer and such add this feature to their apps, an additional roundtrip is needed unless you prefer doing it by hand.</p>
+			<p>This is a tool for automatically setting scene numbers in screenplays written in plain-text Fountain format.</p>
+			<p><a href='https://github.com/lmparppei/Fountain-scene-numbers'>Source code available on GitHub</a></p>
 			<p>Paste or drag Fountain file in the area below.</p>
 			<textarea id='text' ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="stopDrop(event)">Title: Sample Fountain script for testing automatic scene numbering
 
@@ -65,7 +66,7 @@ Scene headings without int./ext. prefix need to be forced.
 		<script>
 
 			// Textarea to use
-			const text = document.getElementById('text');
+			const editor = document.getElementById('text');
 
 			// Default filename for copy/paste scripts
 			let filename = 'Sample.fountain';
@@ -77,7 +78,7 @@ Scene headings without int./ext. prefix need to be forced.
 			}
 			
 			function setSceneNumbers () {
-				const content = text.value;
+				const content = editor.value;
 				const lines = content.split("\n");
 				let newLines = [];
 
@@ -102,7 +103,7 @@ Scene headings without int./ext. prefix need to be forced.
 					newLines.push(line);
 				}
 
-				text.value = newLines.join("\n");
+				editor.value = newLines.join("\n");
 			}
 
 			function allowDrop(ev) {
@@ -116,7 +117,7 @@ Scene headings without int./ext. prefix need to be forced.
 
 			function drop(ev) {
 		   		ev.preventDefault();
-		   		text.className = '';
+		   		editor.className = '';
 
 				const file = ev.dataTransfer.items[0].getAsFile(); 	
 				const content = file.slice(0, file.size, "text");
@@ -127,7 +128,7 @@ Scene headings without int./ext. prefix need to be forced.
 
 				reader.addEventListener('loadend', (e) => {
 					const data = e.srcElement.result;
-					text.value = data;
+					editor.value = data;
 				});
 
 				reader.readAsText(content);
@@ -135,7 +136,7 @@ Scene headings without int./ext. prefix need to be forced.
 
 			// Thanks to A-Sharabiani on stackoverflow
 			function download (){
-			    var content = text.value;
+			    var content = editor.value;
 			    var blob = new Blob([content], { type: "text/plain"});
 			    var anchor = document.createElement("a");
 			    anchor.download = filename;
